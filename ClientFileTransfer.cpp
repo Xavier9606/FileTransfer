@@ -47,14 +47,13 @@ int BUFFSIZE = 5000000;
 int isRecv = 0;
 
 const char* SOURCEPATH = "C:\\Users\\Administrator\\Desktop\\FileTranserTest\\Source.jpg";
-const char* DESTPATH = "C:\\Users\\Administrator\\Desktop\\Received\\Result.jpg";
+const char* DESTPATH = "C:\\Users\\Administrator\\Desktop\\Received\\";
 
 
 void receiveLoop() {
 
-    while (true) {
         thisServerSock.servReceiveFile(DESTPATH);
-    }
+   
  
 }
 
@@ -66,38 +65,48 @@ int main() {
     std::cin >> portSelf;
 
     thisServerSock.initServer(portSelf);
+    thisServerSock.setBufferSize(BUFFSIZE);
     std::thread RecvTH(receiveLoop);
     RecvTH.detach();
 
     std::string ip = "";
-    std::cout << "Enter IP of a buddy: ";
-    std::cin >> ip;
+    //std::cout << "Enter IP of a buddy: ";
+    //std::cin >> ip;
 
     int portOut = 0;
-    std::cout << "Enter your buddy's server port: ";
-    std::cin >> portOut;
+    //std::cout << "Enter your buddy's server port: ";
+    //std::cin >> portOut;
 
 
-    //int other = 0;
-    //if (port == 5555) other = 5556;
-    //if (port == 5556) other = 5555;
+    int other = 0;
+    if (portSelf == 5555) portOut = 5556;
+    if (portSelf == 5556) portOut = 5555;
  
-  
-
-    thisClientSock.connectToServ(ip.c_str, portOut);
-
-    std::string srcFilePath = "";
-    std::cout << "Enter your file location: ";
-    std::cin >> srcFilePath;
-
-    const char* FILENAME = getMyFileName(srcFilePath);
+    char error_code;
+    int error_code_size = sizeof(error_code);
+    //"192.168.88.254"
+    thisClientSock.connectToServ("192.168.88.254", portOut);
+    thisClientSock.setBufferSize(BUFFSIZE);
 
 
-    sendFile(SOURCEPATH, thisClientSock);
+    while (true) {
+        std::cout << getsockopt(thisClientSock.getRawSocket(), SOL_SOCKET, SO_ERROR, &error_code, &error_code_size) << std::endl;
+        if (-1==getsockopt(thisClientSock.getRawSocket(), SOL_SOCKET, SO_ERROR, &error_code, &error_code_size)) {
+            thisClientSock.connectToServ("192.168.88.254", portOut);
+            thisClientSock.setBufferSize(BUFFSIZE);
+        }
+        std::string srcFilePath = "";
+        //std::filesystem::path srcFilePath = "";
+        std::cout << "Enter your file location: ";
+        std::cin >> srcFilePath;
 
-    std::cout << std::endl << "DONE!" << std::endl;
+        //const char* FILENAME = getMyFileName(srcFilePath);
 
-    Sleep(10000000);
+
+        sendFile(srcFilePath.c_str(), thisClientSock);
+
+        std::cout << std::endl << "DONE!" << std::endl;
+    }
 
     return 0;
 }

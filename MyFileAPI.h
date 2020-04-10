@@ -57,30 +57,32 @@ int copyFileData(const char* srcPath, const char* destPath) {
     return 0;
 }
 
-int sendFile(const char* path, SocketsAPI destSocket) {
-
-    int sourcesize = getfilesize(path);
-    std::cout << std::endl << "sourcesize is " << sourcesize << std::endl;
-    destSocket.setBufferSize(sourcesize);
-    char* buffer = new char[sourcesize];
-    if (!0 == readFileData(path, sourcesize, buffer)) {
-        return -1;
-    };
-
-    std::string str{ "xxxxxxxxxxxx" };
-    std::to_chars(str.data(), str.data() + str.size(), sourcesize);
-
-    std::string msg = std::to_string(sourcesize) + "\n";
-    auto msgChars = new char[5000000];
-    destSocket.setBufferSize(5000000);
-    memcpy(msgChars, msg.c_str(), sizeof(msg));
-    memcpy(msgChars + msg.length(), buffer, sourcesize);
-    destSocket.sendMsg(msgChars, sourcesize);
-    delete[] buffer;
-    delete[] msgChars;
-}
-
-const char* getMyFileName(std::string path) {
+std::string getMyFileName(std::string path) {
     std::size_t found = path.find_last_of("/\\");
     return path.substr(found + 1).c_str();
+}
+
+
+int sendFile(const char* path, SocketsAPI destSocket) {
+
+int sourcesize = getfilesize(path);
+//const char* filename = getMyFileName(path).c_str();
+std::cout << std::endl << "sourcesize is " << sourcesize << std::endl;
+//destSocket.setBufferSize(sourcesize);
+char* buffer = new char[sourcesize];
+if (!0 == readFileData(path, sourcesize, buffer)) {
+    return -1;
+};
+
+std::string str{ "xxxxxxxxxxxx" };
+std::to_chars(str.data(), str.data() + str.size(), sourcesize);
+
+std::string msg = std::to_string(sourcesize) + "\n" + getMyFileName(path).c_str() + "\n\n";
+auto msgChars = new char[destSocket.getBufferSize()];
+//destSocket.setBufferSize(5000000);
+memcpy(msgChars, msg.c_str(), sizeof(msg));
+memcpy(msgChars + msg.length(), buffer, sourcesize);
+destSocket.sendMsg(msgChars, sourcesize);
+delete[] buffer;
+delete[] msgChars;
 }

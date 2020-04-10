@@ -112,68 +112,91 @@ char* SocketsAPI::servReceiveFile(const char* destPath) {
         std::cout << "This instance of SocketsAPI is not a server!" << std::endl;
         return 0;
     }
+    while (true) {
+        fd_set copy = master;
 
-    fd_set copy = master;
+        int socketCount = select(NULL, &copy, nullptr, nullptr, nullptr);
+        for (int i = 0; i < socketCount; ++i) {
+            SOCKET sock = copy.fd_array[i];
+            if (sock == server) {
+                SOCKET client = this->client = accept(server, (SOCKADDR*) nullptr, nullptr);
+                FD_SET(client, &master);
+                std::cout << std::endl << "New active client!" << std::endl;
+            }
+            else {
 
-    int socketCount = select(NULL, &copy, nullptr, nullptr, nullptr);
-    auto tempBuff = new char[bufferSize];
-    for (int i = 0; i < socketCount; ++i) {
-        SOCKET sock = copy.fd_array[i];
-        if (sock == server) {
-            SOCKET client = this->client = accept(server, (SOCKADDR*) nullptr, nullptr);
-            FD_SET(client, &master);
-            std::cout << "New active client!";
-        }
-        else {
+                char* tempBuff;
+                int err = 1;
+                tempBuff = this->receiveMsg(&err);
+                if (err <= 0) {
+                    //delete[] tempBuff;
+                    closesocket(sock);
+                    FD_CLR(sock, &master);
+                    continue;
+                };
+                // if (err == 0) continue;
+                std::cout << "received"<< std::endl;
+                std::cout.flush();
 
-            char* tempBuff;
-            int err = 1;
-            tempBuff = this->receiveMsg(&err);
-            if (err <= 0) { 
-                //delete[] tempBuff;
-                return 0; 
-            };
-           // if (err == 0) continue;
-            std::cout << "received";
+                int filePositionStart = 0;
+                std::string fileSizeString = "";
+                std::string fileNameString = "";
+                int filesize = 0;
+                int headLasts = 0;
+                for (int i = 0; i < bufferSize; i++)
+                {
+                    if (tempBuff[i] == '\n') {
+                        if (tempBuff[i + 1] == '\n') {
+                            filePositionStart = i + 2;
+                        }
 
-            int filePositionStart = 0;
-            std::string fileSizeString = "";
-            int filesize = 0;
-            for (int i = 0; i < bufferSize; i++)
-            {
-                if (tempBuff[i] == '\n') {
-                    filePositionStart = i+1;
-                    for (int j = 0; j < i; j++) {
-                        fileSizeString += tempBuff[j];
+                        if (!headLasts) {
+                            for (int j = 0; j < i; j++) {
+                                fileSizeString += tempBuff[j];
+                            }
+                            std::from_chars(fileSizeString.data(), fileSizeString.data() + fileSizeString.size(), filesize);
+                            std::cout << "FILESIZE IS: " << filesize << std::endl;
+                            headLasts = i + 1;
+                            continue;
+                        }
+
+                        for (int j = headLasts; j < filePositionStart - 2; j++) {
+                            fileNameString += tempBuff[j];
+                        }
+                        break;
                     }
-                    std::from_chars(fileSizeString.data(), fileSizeString.data() + fileSizeString.size(), filesize);
-                    std::cout << std::endl << "FILESIZE IS: " << filesize << std::endl;
-                    break;
+
+                }
+               // std::cout << std::endl << "FROM IS: " << filePositionStart << std::endl;
+                FILE* dest;
+
+                std::string finalFileName = destPath + fileNameString;
+                if ((dest = fopen(finalFileName.c_str(), "wb")) == NULL) {
+                    std::cout << "CANT OPEN/CREATE DEST FILE!" << std::endl;;
+                    return 0;
                 }
 
+                fwrite(tempBuff + filePositionStart, filesize, 1, dest);
+                fflush(dest);
+                fclose(dest);
+                std::cout << std::endl << "File " << fileNameString << " successfully writen!" << std::endl << std::endl;
             }
-           std::cout << std::endl << "FROM IS: " << filePositionStart << std::endl;
-           FILE* dest;
-
-           if ((dest = fopen(destPath, "wb")) == NULL) {
-               std::cout << "CANT OPEN/CREATE DEST FILE!";
-               return 0;
-           }
-
-           fwrite(tempBuff + filePositionStart, filesize, 1, dest);
-           fflush(dest);
-           fclose(dest);
-           //delete[] tempBuff;
-           std::cout << std::endl << "FILE WRITTEN!!!" << std::endl;
         }
     }
-   // delete[] tempBuff;
 }
 
 void SocketsAPI::setBufferSize(int size) {
     delete[] buffer;
     bufferSize = size;
     buffer = new char[bufferSize];
+}
+
+int SocketsAPI::getBufferSize() {
+    return bufferSize;
+}
+
+SOCKET SocketsAPI::getRawSocket() {
+    return this->server;
 }
 
 void SocketsAPI::destroyConnection() {

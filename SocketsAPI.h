@@ -40,6 +40,10 @@ public:
 
     void setBufferSize(int size);
 
+    int getBufferSize();
+
+    SOCKET getRawSocket();
+
     void clearBuffer();
 
     void destroyConnection();
