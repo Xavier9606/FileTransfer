@@ -38,71 +38,66 @@ DONE Direct transfer thru sockets protoype
      Various Plug-in version realisation
 
 */
-
-
-
-
 #include "ClientFileTransfer.h"
 
 
+SocketsAPI thisClientSock;
+SocketsAPI thisServerSock;
+int BUFFSIZE = 5000000;
+int isRecv = 0;
+
+const char* SOURCEPATH = "C:\\Users\\Administrator\\Desktop\\FileTranserTest\\Source.jpg";
+const char* DESTPATH = "C:\\Users\\Administrator\\Desktop\\Received\\Result.jpg";
+
+
+void receiveLoop() {
+
+    while (true) {
+        thisServerSock.servReceiveFile(DESTPATH);
+    }
+ 
+}
+
+
 int main() {
-    const char* SOURCEPATH = "C:\\Users\\Administrator\\Desktop\\FileTranserTest\\Source.jpg";
-    const char* DESTPATH = "C:\\Users\\Administrator\\Desktop\\FileTranserTest\\Result.jpg";
+
+    int portSelf=0;
+    std::cout << "Enter your open port to create your server: ";
+    std::cin >> portSelf;
+
+    thisServerSock.initServer(portSelf);
+    std::thread RecvTH(receiveLoop);
+    RecvTH.detach();
+
+    std::string ip = "";
+    std::cout << "Enter IP of a buddy: ";
+    std::cin >> ip;
+
+    int portOut = 0;
+    std::cout << "Enter your buddy's server port: ";
+    std::cin >> portOut;
 
 
-    WSADATA WSAData;
-    SOCKET server;
-    SOCKADDR_IN serverAddr;
+    //int other = 0;
+    //if (port == 5555) other = 5556;
+    //if (port == 5556) other = 5555;
+ 
+  
 
-    WSAStartup(MAKEWORD(2, 0), &WSAData);
-    server = socket(AF_INET, SOCK_STREAM, 0);
-    serverAddr.sin_addr.s_addr = INADDR_ANY;
-    serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(5555);
+    thisClientSock.connectToServ(ip.c_str, portOut);
 
-    bind(server, (SOCKADDR*)&serverAddr, sizeof(serverAddr));
+    std::string srcFilePath = "";
+    std::cout << "Enter your file location: ";
+    std::cin >> srcFilePath;
 
-    listen(server, 0);
-
-    ClientAPI client;
-    client.initConnection();
+    const char* FILENAME = getMyFileName(srcFilePath);
 
 
-    int sourcesize = getfilesize(SOURCEPATH);
-    std::cout << std::endl << "sourcesize is " << sourcesize<< std::endl;
-    client.setBufferSize(sourcesize);
-    char* buffer = new char[sourcesize];
-    if (!0 == readFileData(SOURCEPATH, sourcesize, buffer)) {
-        return -1;
-    };
-    //writeFileData(DESTPATH, sourcesize, buffer);
-
-    std::string str{ "xxxxxxxxxxxx" };
-    std::to_chars(str.data(), str.data() + str.size(), sourcesize);
-
-    std::string msg = std::to_string(sourcesize) + "\n";
-    auto msgChars = new char[5000000];
-    client.setBufferSize(5000000);
-    memcpy(msgChars, msg.c_str(), sizeof(msg));
-    memcpy(msgChars + msg.length(), buffer, sourcesize);
-    client.sendMsg(msgChars, sourcesize);
-
-    //writeFileData(DESTPATH, sourcesize, msgChars,6);
-
-    std::cout << std::endl << "sourcesize = " << sourcesize << std::endl;
-    auto charTest = new char[100];
-    memcpy(charTest, static_cast<void*>(&sourcesize), sizeof(int));
-    int newInt = 0;
-    memmove(static_cast<void*>(&newInt), charTest, sizeof(int));
-    newInt++;
-    std::cout << std::endl << "Transfered int = " << newInt<<std::endl;
-    std::cout << std::endl << "sizeof transfered int " << sizeof(newInt) <<std::endl;
-    std::cout << std::endl << "sizeof static_cast<void*>(&newInt) " << sizeof(static_cast<void*>(&newInt)) <<std::endl;
-    std::cout << std::endl << "typeid newInt " << typeid(static_cast<void*>(&newInt)).name() <<std::endl;
-    std::cout << std::endl << "sizeof newInt " << sizeof(newInt) <<std::endl;
+    sendFile(SOURCEPATH, thisClientSock);
 
     std::cout << std::endl << "DONE!" << std::endl;
 
+    Sleep(10000000);
 
     return 0;
 }

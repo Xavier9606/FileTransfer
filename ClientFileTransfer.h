@@ -2,8 +2,6 @@
 // or project specific include files.
 #pragma once
 
-#include "ClientFileTransfer.h"
-
 //Qt
 #include <QFile>
 #include <QDataStream>
@@ -17,6 +15,8 @@
 #include "stdio.h"
 #include <iostream>
 #include <charconv>
+#include <thread>
+
 //My API's & etc
 #include "SocketsAPI.h"
 #include "MyFileAPI.h"
