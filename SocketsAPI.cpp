@@ -133,6 +133,7 @@ char* SocketsAPI::servReceiveFile(const char* destPath, SocketsAPI* thisClient, 
 
                // char* buffer = new char[bufferSize];
                 //ZeroMemory(buffer, bufferSize);
+                this->clearBuffer();
                 int err = recv(sock, buffer, bufferSize, 0); ;
                 
                 //tempBuff = this->receiveMsg(&err);

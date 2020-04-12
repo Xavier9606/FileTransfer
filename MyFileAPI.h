@@ -83,7 +83,7 @@ auto msgChars = new char[destSocket->getBufferSize()];
 memcpy(msgChars, msg.c_str(), sizeof(msg));
 memcpy(msgChars + msg.length(), buffer, sourcesize);
 //send(server, buffer, size, 0);
-destSocket->sendMsg(msgChars, sourcesize);
+destSocket->sendMsg(msgChars, sourcesize+sizeof(msg));
 delete[] buffer;
 delete[] msgChars;
 }
