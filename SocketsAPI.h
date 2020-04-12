@@ -11,9 +11,10 @@ private:
     SOCKET client;
     SOCKADDR_IN addr;
     SOCKADDR_IN serverAddr;
-    int bufferSize = 5000000;
+    int bufferSize = 50000000;
     char* buffer = new char[bufferSize];
     int isServer = 0;
+
     fd_set master;
 
     //char buffer[1024] ;
@@ -36,7 +37,7 @@ public:
 
     char* receiveMsg();
 
-    char* servReceiveFile(const char* destPath);
+    char* servReceiveFile(const char* destPath, SocketsAPI* thisClient, const char* ip = "127.0.0.1", u_short port = 5555);
 
     void setBufferSize(int size);
 

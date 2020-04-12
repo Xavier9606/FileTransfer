@@ -63,7 +63,7 @@ std::string getMyFileName(std::string path) {
 }
 
 
-int sendFile(const char* path, SocketsAPI destSocket) {
+int sendFile(const char* path, SocketsAPI* destSocket) {
 
 int sourcesize = getfilesize(path);
 //const char* filename = getMyFileName(path).c_str();
@@ -78,11 +78,12 @@ std::string str{ "xxxxxxxxxxxx" };
 std::to_chars(str.data(), str.data() + str.size(), sourcesize);
 
 std::string msg = std::to_string(sourcesize) + "\n" + getMyFileName(path).c_str() + "\n\n";
-auto msgChars = new char[destSocket.getBufferSize()];
+auto msgChars = new char[destSocket->getBufferSize()];
 //destSocket.setBufferSize(5000000);
 memcpy(msgChars, msg.c_str(), sizeof(msg));
 memcpy(msgChars + msg.length(), buffer, sourcesize);
-destSocket.sendMsg(msgChars, sourcesize);
+//send(server, buffer, size, 0);
+destSocket->sendMsg(msgChars, sourcesize);
 delete[] buffer;
 delete[] msgChars;
 }

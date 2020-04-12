@@ -7,7 +7,7 @@
                             MVP
 DONE Direct transfer thru sockets protoype
      Server/client 2in1 simple API
-     Filename transfer (+file info);
+DONE Filename transfer (+file info);
      MD5Hash
      Chunking files (probably std::map int, char[1024])
      Login/connectivity server
@@ -40,23 +40,31 @@ DONE Direct transfer thru sockets protoype
 */
 #include "ClientFileTransfer.h"
 
+#define DEBUG
 
 SocketsAPI thisClientSock;
 SocketsAPI thisServerSock;
-int BUFFSIZE = 5000000;
+int BUFFSIZE = 50000000;
 int isRecv = 0;
+std::string ip = "";
+int portOut = 0;
 
 const char* SOURCEPATH = "C:\\Users\\Administrator\\Desktop\\FileTranserTest\\Source.jpg";
-const char* DESTPATH = "C:\\Users\\Administrator\\Desktop\\Received\\";
+std::string DESTPATH = "C:\\Users\\Administrator\\Desktop\\Received\\";
 
 
 void receiveLoop() {
 
-        thisServerSock.servReceiveFile(DESTPATH);
+        thisServerSock.servReceiveFile(DESTPATH.c_str(),&thisClientSock, "192.168.88.254", portOut);
    
  
 }
-
+bool is_connected(int sock)
+{
+    char buf;
+    int err = recv(sock, &buf, 1, MSG_PEEK);
+    return err == -1 ? false : true;
+}
 
 int main() {
 
@@ -64,46 +72,71 @@ int main() {
     std::cout << "Enter your open port to create your server: ";
     std::cin >> portSelf;
 
+    if (portSelf == 1) portSelf = 5555;
+    if (portSelf == 2) portSelf = 5556;
+
     thisServerSock.initServer(portSelf);
     thisServerSock.setBufferSize(BUFFSIZE);
     std::thread RecvTH(receiveLoop);
     RecvTH.detach();
 
-    std::string ip = "";
-    //std::cout << "Enter IP of a buddy: ";
-    //std::cin >> ip;
+   
+#ifndef DEBUG
 
-    int portOut = 0;
-    //std::cout << "Enter your buddy's server port: ";
-    //std::cin >> portOut;
 
+    std::cout << "Enter IP of a buddy: ";
+    std::cin >> ip;
+
+ 
+    std::cout << "Enter your buddy's server port: ";
+    std::cin >> portOut;
+
+#endif // !debug 
 
     int other = 0;
+
     if (portSelf == 5555) portOut = 5556;
     if (portSelf == 5556) portOut = 5555;
- 
-    char error_code;
-    int error_code_size = sizeof(error_code);
-    //"192.168.88.254"
-    thisClientSock.connectToServ("192.168.88.254", portOut);
+
+
+#ifndef DEBUG
+    std::cout << "Where to save?: " << std::endl;
+    std::string destPathString = "";
+    std::cin >> destPathString;
+
+
+
+    if ('\\' != destPathString.back() || '/' != destPathString.back()) {
+        destPathString += '\\';
+    }
+
+    DESTPATH = destPathString.c_str();
+
+#endif // !debug 
+
+    std::cout << std::endl << "Enter anything to connect ";
+    std::string test = "";
+    std::cin >> test;
+
+#ifdef DEBUG
+    ip = "192.168.88.254";
+#endif // !debug 
+
+    thisClientSock.connectToServ(ip.c_str(), portOut);
     thisClientSock.setBufferSize(BUFFSIZE);
 
 
+
+
+
     while (true) {
-        std::cout << getsockopt(thisClientSock.getRawSocket(), SOL_SOCKET, SO_ERROR, &error_code, &error_code_size) << std::endl;
-        if (-1==getsockopt(thisClientSock.getRawSocket(), SOL_SOCKET, SO_ERROR, &error_code, &error_code_size)) {
-            thisClientSock.connectToServ("192.168.88.254", portOut);
-            thisClientSock.setBufferSize(BUFFSIZE);
-        }
+
         std::string srcFilePath = "";
         //std::filesystem::path srcFilePath = "";
         std::cout << "Enter your file location: ";
         std::cin >> srcFilePath;
 
-        //const char* FILENAME = getMyFileName(srcFilePath);
-
-
-        sendFile(srcFilePath.c_str(), thisClientSock);
+        sendFile(srcFilePath.c_str(), &thisClientSock);
 
         std::cout << std::endl << "DONE!" << std::endl;
     }

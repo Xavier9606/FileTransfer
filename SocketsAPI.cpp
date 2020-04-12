@@ -77,8 +77,8 @@ int SocketsAPI::connectToServ(const char* ip , u_short port) {
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
 
-    connect(server, (SOCKADDR*)&addr, sizeof(addr));
-    listen(server, 0);
+    connect(this->server, (SOCKADDR*)&addr, sizeof(addr));
+    listen(this->server, 0);
 
     return server;
 }
@@ -106,7 +106,7 @@ char* SocketsAPI::receiveMsg() {
     return buffer;
 }
 
-char* SocketsAPI::servReceiveFile(const char* destPath) {
+char* SocketsAPI::servReceiveFile(const char* destPath, SocketsAPI* thisClient, const char* ip , u_short port) {
   
     if (!isServer) {
         std::cout << "This instance of SocketsAPI is not a server!" << std::endl;
@@ -119,40 +119,49 @@ char* SocketsAPI::servReceiveFile(const char* destPath) {
         for (int i = 0; i < socketCount; ++i) {
             SOCKET sock = copy.fd_array[i];
             if (sock == server) {
-                SOCKET client = this->client = accept(server, (SOCKADDR*) nullptr, nullptr);
+                SOCKET client =  accept(server, (SOCKADDR*) nullptr, nullptr);
                 FD_SET(client, &master);
-                std::cout << std::endl << "New active client!" << std::endl;
+                std::cout << std::endl << "New active client! " << client << std::endl;
+              //  std::cout << std::endl << thisClient->getRawSocket() << client << std::endl;
+
+               
+                char error_code;
+                int error_code_size = sizeof(error_code);
+
             }
             else {
 
-                char* tempBuff;
-                int err = 1;
-                tempBuff = this->receiveMsg(&err);
+               // char* buffer = new char[bufferSize];
+                //ZeroMemory(buffer, bufferSize);
+                int err = recv(sock, buffer, bufferSize, 0); ;
+                
+                //tempBuff = this->receiveMsg(&err);
                 if (err <= 0) {
-                    //delete[] tempBuff;
+                  //  delete[] buffer;
                     closesocket(sock);
                     FD_CLR(sock, &master);
+                    std::cout << std::endl << "Socket "<< sock <<" connection destroyed! " << std::endl;
                     continue;
                 };
                 // if (err == 0) continue;
                 std::cout << "received"<< std::endl;
                 std::cout.flush();
 
-                int filePositionStart = 0;
+                int filePositionOffset = 0;
                 std::string fileSizeString = "";
                 std::string fileNameString = "";
                 int filesize = 0;
                 int headLasts = 0;
                 for (int i = 0; i < bufferSize; i++)
                 {
-                    if (tempBuff[i] == '\n') {
-                        if (tempBuff[i + 1] == '\n') {
-                            filePositionStart = i + 2;
+                    if (buffer[i] == '\n') {
+                        if (buffer[i + 1] == '\n') {
+                            filePositionOffset = i + 2;
                         }
 
                         if (!headLasts) {
                             for (int j = 0; j < i; j++) {
-                                fileSizeString += tempBuff[j];
+                                fileSizeString += buffer[j];
                             }
                             std::from_chars(fileSizeString.data(), fileSizeString.data() + fileSizeString.size(), filesize);
                             std::cout << "FILESIZE IS: " << filesize << std::endl;
@@ -160,8 +169,8 @@ char* SocketsAPI::servReceiveFile(const char* destPath) {
                             continue;
                         }
 
-                        for (int j = headLasts; j < filePositionStart - 2; j++) {
-                            fileNameString += tempBuff[j];
+                        for (int j = headLasts; j < filePositionOffset - 2; j++) {
+                            fileNameString += buffer[j];
                         }
                         break;
                     }
@@ -176,10 +185,11 @@ char* SocketsAPI::servReceiveFile(const char* destPath) {
                     return 0;
                 }
 
-                fwrite(tempBuff + filePositionStart, filesize, 1, dest);
+                fwrite(buffer + filePositionOffset, filesize, 1, dest);
                 fflush(dest);
                 fclose(dest);
                 std::cout << std::endl << "File " << fileNameString << " successfully writen!" << std::endl << std::endl;
+              //  delete[] buffer;
             }
         }
     }
