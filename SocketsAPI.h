@@ -4,52 +4,52 @@
 #include <charconv>
 //#include "MyFileAPI.h"
 
-class SocketsAPI{
+class SocketsAPI {
 private:
-    WSADATA WSAData;
-    SOCKET server;
-    SOCKET client;
-    SOCKADDR_IN addr;
-    SOCKADDR_IN serverAddr;
-    int bufferSize = 50000000;
-    char* buffer = new char[bufferSize];
-    int isServer = 0;
+	WSADATA WSAData;
+	SOCKET server;
+	SOCKET client;
+	SOCKADDR_IN addr;
+	SOCKADDR_IN serverAddr;
+	int bufferSize = 50000000;
+	char* buffer = new char[bufferSize];
+	int isServer = 0;
 
-    fd_set master;
+	fd_set master;
 
-    //char buffer[1024] ;
+	//char buffer[1024] ;
 
 
 public:
-    int connActive = 0;
+	int connActive = 0;
 
-    int initServer(int port);
+	int initServer(int port);
 
-    int servAccept();
+	int servAccept();
 
-    void servAcceptLoop();
+	void servAcceptLoop();
 
-    int connectToServ(const char* ip = "127.0.0.1", u_short port = 5555);
+	int connectToServ(const char* ip = "127.0.0.1", u_short port = 5555);
 
-    void sendMsg(char* msg, int size);
+	void sendMsg(char* msg, int size);
 
-    char* receiveMsg(int* err);
+	char* receiveMsg(int* err);
 
-    char* receiveMsg();
+	char* receiveMsg();
 
-    char* servReceiveFile(const char* destPath, SocketsAPI* thisClient, const char* ip = "127.0.0.1", u_short port = 5555);
+	char* servReceiveFile(const char* destPath, SocketsAPI* thisClient, const char* ip = "127.0.0.1", u_short port = 5555);
 
-    void setBufferSize(int size);
+	void setBufferSize(int size);
 
-    int getBufferSize();
+	int getBufferSize();
 
-    SOCKET getRawSocket();
+	SOCKET getRawSocket();
 
-    void clearBuffer();
+	void clearBuffer();
 
-    void destroyConnection();
+	void destroyConnection();
 
-    ~SocketsAPI();
+	~SocketsAPI();
 };
 
 

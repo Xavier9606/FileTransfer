@@ -26,11 +26,11 @@
 
 //Misc
 int numberOfDigits(int numToCheck) {
-    for (int i = 1; i < 20; i++) {
-        numToCheck /= 10;
-        if (numToCheck <= 0) {
-            return i;
-        }
-    }
+	for (int i = 1; i < 20; i++) {
+		numToCheck /= 10;
+		if (numToCheck <= 0) {
+			return i;
+		}
+	}
 }
 // TODO: Reference additional headers your program requires here.
