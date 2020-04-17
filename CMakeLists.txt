@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(Qt5 COMPONENTS Widgets Core Network)
 
 # Add source to this project's executable.
-add_executable (ClientFileTransfer "ClientFileTransfer.cpp" "ClientFileTransfer.h" "SocketsAPI.cpp" "SocketsAPI.h" "MyFileAPI.h")
+add_executable (ClientFileTransfer "ClientFileTransfer.cpp" "ClientFileTransfer.h" "SocketsAPI.cpp" "SocketsAPI.h" "MyFileAPI.h" "ChunkInfo.h" "FileInfo.h")
 
 # TODO: Add tests and install targets if needed.
 

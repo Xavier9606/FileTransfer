@@ -22,6 +22,7 @@
 //My API's & etc
 #include "SocketsAPI.h"
 #include "MyFileAPI.h"
+#include "FileInfo.h"
 
 
 //Misc
