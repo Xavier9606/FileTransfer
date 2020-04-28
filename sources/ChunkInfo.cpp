@@ -1,39 +1,17 @@
 #pragma once
-
-#define CHUNKINFO_INIT 2
-#define READ_CHUNK 1
-#define MAKE_CHUNK 0
-
-class ChunkInfo {
-
-private:
-	int sendReady = 0;
+#include "headers/ChunkInfo.h"
 
 
-public:
-
-	int chunkSize = 0;				//
-	std::string fileName = "";		//		mandatory when writing
-	int sourceFileSize = 0;			//
-	int chunkMapPos = 0;
-
-	int chunkDataOffset = 0;
-	int bytesLeft = 0;
-	int chunksCount = 0;
-	char* chunkRawFileData = nullptr;
-
-	ChunkInfo(std::string fileName, int sourceFileSize, int chunkSize) : fileName(fileName), sourceFileSize(sourceFileSize), chunkSize(chunkSize) {
+ChunkInfo::ChunkInfo(std::string fileName, int sourceFileSize, int chunkSize) : fileName(fileName), sourceFileSize(sourceFileSize), chunkSize(chunkSize) {
 		sendReady = 1;
 		initChunksCountInfo();
-		//chunkRawFileData = new char[this->chunkSize+300];
 	}
 
-	ChunkInfo(char* chunkMsg) {
+ChunkInfo::ChunkInfo(char* chunkMsg) {
 		parseChunk(chunkMsg, 2);
-		//chunkRawFileData = new char[this->chunkSize+300];
 	}
 
-	void initChunksCountInfo() {
+	void ChunkInfo::initChunksCountInfo() {
 		bytesLeft = sourceFileSize % chunkSize;
 		if (sourceFileSize >= chunkSize) {
 			chunksCount = (sourceFileSize - bytesLeft) / chunkSize;
@@ -46,23 +24,21 @@ public:
 
 	}
 
-	int isSendReady() {
+	int ChunkInfo::isSendReady() {
 		if (chunkSize && sourceFileSize && (fileName != "")) {
 			sendReady = 1;
 		}
 		return sendReady;
 	}
 
-	char* parseChunk(char* chunkMsg, int flag) {
+	char* ChunkInfo::parseChunk(char* chunkMsg, int flag) {
 
-		//(HEAD) chunkMapPos(int), sourceFileSize(int), chunkSize(int), filename(string), \n , *File data*
+		//HEAD: chunkMapPos(int), sourceFileSize(int), chunkSize(int), filename(string), \n (head terminator) , *File data*
 
 		char headTerminator = '\n';
 
 		if (MAKE_CHUNK == flag) {
 			if (!this->isSendReady()) { std::cout << std::endl << "This ChunkInfo instance have not enough parameters to be send!" << std::endl; return nullptr; }
-
-
 
 			char* msg = nullptr;
 			chunkDataOffset = 0;
@@ -74,8 +50,6 @@ public:
 				msg = new char[chunkSize + 300];
 			}
 
-
-
 			memcpy(msg + chunkDataOffset, static_cast<void*>(&this->chunkMapPos), sizeof(int)); //chunkMapPos
 			chunkDataOffset += sizeof(int);
 			memcpy(msg + chunkDataOffset, static_cast<void*>(&this->sourceFileSize), sizeof(int)); //sourcesize
@@ -85,16 +59,12 @@ public:
 			memcpy(msg + chunkDataOffset, this->fileName.c_str(), this->fileName.size());	//fileName
 			chunkDataOffset += this->fileName.size();
 
-
-
-			msg[chunkDataOffset] = headTerminator;
+			msg[chunkDataOffset] = headTerminator;			//terminator
 			chunkDataOffset++;
-
-
 
 			if (chunkMapPos == chunksCount - 1) {
 				memcpy(msg + chunkDataOffset, chunkMsg, bytesLeft);
-			}
+			}															//*File data*
 			else {
 				memcpy(msg + chunkDataOffset, chunkMsg, chunkSize);
 			}
@@ -107,7 +77,7 @@ public:
 
 		if (READ_CHUNK == flag || CHUNKINFO_INIT == flag) {
 
-			//(HEAD) chunkMapPos(int), sourceFileSize(int), chunkSize(int), filename(string), \n , *File data*
+			//HEAD: chunkMapPos(int), sourceFileSize(int), chunkSize(int), filename(string), \n (head terminator) , *File data*
 
 			memcpy(static_cast<void*>(&this->chunkMapPos), chunkMsg, sizeof(int)); //chunkMapPos
 
@@ -151,9 +121,8 @@ public:
 
 	}
 
-	~ChunkInfo() {
+	ChunkInfo::~ChunkInfo() {
 		if (nullptr != chunkRawFileData) {
 			//delete[] chunkRawFileData;
 		}
 	}
-};

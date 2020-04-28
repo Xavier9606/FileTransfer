@@ -1,6 +1,12 @@
 #pragma once
+//#include <iostream>
+#include "headers/FileInfo.h"
+#include "headers/SocketsAPI.h"
+#include <charconv>
+#include <string>
+//#include "headers/FileInfo.h"
 
-FILE* openMyFile(const char* path, const char* mode) {
+inline FILE* openMyFile(const char* path, const char* mode) {
 	FILE* file;
 
 	if ((file = fopen(path, mode)) == NULL) {
@@ -10,12 +16,12 @@ FILE* openMyFile(const char* path, const char* mode) {
 	return file;
 }
 
-void closeMyFile(FILE* file) {
+inline void closeMyFile(FILE* file) {
 	fclose(file);
 }
 
 
-int getfilesize(const char* path) {
+inline int getfilesize(const char* path) {
 	FILE* source;
 
 	if ((source = fopen(path, "rb")) == NULL) {
@@ -29,7 +35,7 @@ int getfilesize(const char* path) {
 	return filesize;
 }
 
-int readFileData(const char* path, int filesize, char*& buffer) {
+inline int readFileData(const char* path, int filesize, char*& buffer) {
 
 	FILE* source;
 
@@ -43,7 +49,7 @@ int readFileData(const char* path, int filesize, char*& buffer) {
 	return 0;
 };
 
-void writeFileData(const char* path, int filesize, char* buffer, int from = 0) {
+inline void writeFileData(const char* path, int filesize, char* buffer, int from = 0) {
 
 	std::cout << std::endl << "FROM IS: " << from << std::endl;
 	FILE* dest;
@@ -58,7 +64,7 @@ void writeFileData(const char* path, int filesize, char* buffer, int from = 0) {
 	fclose(dest);
 };
 
-int copyFileData(const char* srcPath, const char* destPath) {
+inline int copyFileData(const char* srcPath, const char* destPath) {
 
 	int sourcesize = getfilesize(srcPath);
 	char* buffer = new char[sourcesize];
@@ -71,12 +77,12 @@ int copyFileData(const char* srcPath, const char* destPath) {
 	return 0;
 }
 
-std::string getMyFileName(std::string path) {
+inline std::string getMyFileName(std::string path) {
 	std::size_t found = path.find_last_of("/\\");
 	return path.substr(found + 1).c_str();
 }
 
-int sendFile(const char* path, SocketsAPI* destSocket) {
+inline int sendFile(const char* path, SocketsAPI* destSocket) {
 
 	int sourcesize = getfilesize(path);
 	//const char* filename = getMyFileName(path).c_str();
@@ -100,6 +106,5 @@ int sendFile(const char* path, SocketsAPI* destSocket) {
 	delete[] buffer;
 	delete[] msgChars;
 }
-
 
 

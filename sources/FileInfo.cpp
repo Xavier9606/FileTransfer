@@ -1,41 +1,7 @@
-#pragma once
-#include "ChunkInfo.h"
+#include "headers/FileInfo.h"
 
-#define CHUNKINFO_INIT 2
-#define READ_CHUNK 1
-#define MAKE_CHUNK 0
 
-class FileInfo {
-public:
-	int isComplete() {
-		return complete;
-	}
-
-private:
-
-	std::string fileFullPath = "";
-	std::string tempFileFullPath = "";
-	std::string fileName = "";
-	std::string mapFilePath = "";
-	int fullFileSize = 0;
-	int chunkSize = 0;
-	int chunksSaved = 0;
-
-	int chunksCount = 0;
-	int bytesLeft = 0;
-	int bytesLeftFlag = 0;
-
-	int bindedToMap = 0;
-	int complete = 0;
-
-	int state = 0;
-
-	FILE* thisFilePointer = nullptr;
-	FILE* thisMapFilePointer = nullptr;
-
-	ChunkInfo* chunkInfo = nullptr;
-
-	void initChunksCountInfo() {
+	void FileInfo::initChunksCountInfo() {
 		bytesLeft = fullFileSize % chunkSize;
 		if (bytesLeft) bytesLeftFlag = 1;
 		if (fullFileSize >= chunkSize) {
@@ -47,7 +13,7 @@ private:
 		}
 	}
 
-	FILE* createMapFile() {
+	FILE* FileInfo::createMapFile() {
 
 		std::string realFilePath = fileFullPath;
 		FILE* file = fopen(mapFilePath.c_str(), "r+b");
@@ -73,7 +39,7 @@ private:
 		return file;
 	}
 
-	int updateMapFile() {
+	int FileInfo::updateMapFile() {
 
 		FILE* mapFile = thisMapFilePointer;
 		if (!bindedToMap) {
@@ -100,7 +66,7 @@ private:
 			bindedToMap = 1;
 
 		}
-
+		//std::cout << chunksSaved << "\n";
 		int filePathOffset = 0;
 		filePathOffset = fileFullPath.size();
 
@@ -159,7 +125,7 @@ private:
 		return 0;
 	}
 
-	int writeChunkDataToFile() {
+	int FileInfo::writeChunkDataToFile() {
 
 		FILE* destFile = thisFilePointer;
 
@@ -178,7 +144,7 @@ private:
 		return err;
 	}
 
-	char* readChunkData(int chunkMapPos) {
+	char* FileInfo::readChunkData(int chunkMapPos) {
 
 
 		char* chunkData = new char[chunkSize];
@@ -195,7 +161,7 @@ private:
 
 	}
 
-	char* readChunkData(ChunkInfo* chunkInfo, int chunkMapPos, FILE* srcFile) {
+	char* FileInfo::readChunkData(ChunkInfo* chunkInfo, int chunkMapPos, FILE* srcFile) {
 
 		char* chunkData = new char[chunkInfo->chunkSize];
 		chunkInfo->chunkMapPos = chunkMapPos;
@@ -211,9 +177,8 @@ private:
 
 	}
 
-public:
 
-	int initForRecv(char* anyRecvdChunk, std::string fileSavePath, std::string tempExt, std::string mapPath, std::string mapExt) {
+	int FileInfo::initForRecv(char* anyRecvdChunk, std::string fileSavePath, std::string tempExt, std::string mapPath, std::string mapExt) {
 		if (1 == state) {
 			std::cout << "This instance of FileInfo object is already initialized for send\n";
 			return 1;
@@ -261,7 +226,7 @@ public:
 		return 0;
 	}
 
-	int initForSend(std::string sourceFileFullPath, int chunkSize) {
+	int FileInfo::initForSend(std::string sourceFileFullPath, int chunkSize) {
 		if (2 == state) {
 			std::cout << "This instance of FileInfo object is already initialized for receive\n";
 			return 1;
@@ -283,19 +248,19 @@ public:
 		return 0;
 	}
 
-	char* createChunk(int mapPos) {
+	char* FileInfo::createChunk(int mapPos) {
 
 		return chunkInfo->parseChunk(readChunkData(mapPos), MAKE_CHUNK);
 	}
 
-	int writeChunk(char* recvdChunk) {
+	int FileInfo::writeChunk(char* recvdChunk) {
 
 		chunkInfo->parseChunk(recvdChunk, READ_CHUNK);
 
 		return writeChunkDataToFile();
 	}
 
-	int resolveFile() {
+	int FileInfo::resolveFile() {
 		FileInfo* fileInfo = this;
 		if (!fileInfo->complete) {
 			std::cout << "\nFailed to resolve file " << fileInfo->tempFileFullPath << " (file is not complete)\n";
@@ -313,12 +278,12 @@ public:
 		return 0;
 	}
 
-	int fileContainsChunk(char* chunk) {
+	int FileInfo::fileContainsChunk(char* chunk) {
 		chunkInfo->parseChunk(chunk, READ_CHUNK);
-		fileContainsChunk(chunkInfo, thisFilePointer);
+		return fileContainsChunk(chunkInfo, thisFilePointer);
 	}
 
-	int fileContainsChunk(ChunkInfo* chunkInfoToCompare, FILE* srcFile) {
+	int FileInfo::fileContainsChunk(ChunkInfo* chunkInfoToCompare, FILE* srcFile) {
 
 		char* chunkData = nullptr;
 		int amountToCompare = 0;
@@ -347,15 +312,15 @@ public:
 		return isEqual;
 	}
 
-	int getChunksCount() {
+	int FileInfo::getChunksCount() {
 		return chunksCount;
 	}
 
-	~FileInfo() {
+	FileInfo::~FileInfo() {
 		if (nullptr != chunkInfo) {
 			delete chunkInfo;
 		}
 	}
 
-};
+
 

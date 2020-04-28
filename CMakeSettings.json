@@ -1,5 +1,4 @@
 ﻿{
-  // See https://go.microsoft.com//fwlink//?linkid=834763 for more information about this file.
   "configurations": [
     {
       "name": "x64-Debug",
@@ -10,7 +9,39 @@
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "-v",
-      "ctestCommandArgs": ""
+      "ctestCommandArgs": "",
+      "variables": [
+        {
+          "name": "Qt5Network_DIR",
+          "value": "C:/Qt/5.14.1/msvc2017_64/lib/cmake/Qt5Network",
+          "type": "PATH"
+        },
+        {
+          "name": "Qt5Widgets_DIR",
+          "value": "C:/Qt/5.14.1/msvc2017_64/lib/cmake/Qt5Widgets",
+          "type": "PATH"
+        },
+        {
+          "name": "Qt5Gui_DIR",
+          "value": "C:/Qt/5.14.1/msvc2017_64/lib/cmake/Qt5Gui",
+          "type": "PATH"
+        },
+        {
+          "name": "Qt5Core_DIR",
+          "value": "C:/Qt/5.14.1/msvc2017_64/lib/cmake/Qt5Core",
+          "type": "PATH"
+        },
+        {
+          "name": "Qt5_DIR",
+          "value": "C:/Qt/5.14.1/msvc2017_64/lib/cmake/Qt5",
+          "type": "PATH"
+        },
+        {
+          "name": "CMAKE_BUILD_TYPE",
+          "value": "Debug",
+          "type": "STRING"
+        }
+      ]
     }
   ]
 }

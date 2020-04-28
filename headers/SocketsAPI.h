@@ -2,7 +2,7 @@
 #include <winsock2.h>
 #include <iostream>
 #include <charconv>
-//#include "MyFileAPI.h"
+#include <queue>
 
 class SocketsAPI {
 private:
@@ -38,6 +38,8 @@ public:
 	char* receiveMsg();
 
 	char* servReceiveFile(const char* destPath, SocketsAPI* thisClient, const char* ip = "127.0.0.1", u_short port = 5555);
+
+	char* servReceiveFileInChunks(std::queue<char*>* queue, const char* destPath, SocketsAPI* thisClient, const char* ip = "127.0.0.1", u_short port = 5555);
 
 	void setBufferSize(int size);
 

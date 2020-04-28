@@ -1,4 +1,5 @@
-#include "SocketsAPI.h"
+#include "headers/SocketsAPI.h"
+#include "headers/FileInfo.h"
 
 
 
@@ -191,6 +192,73 @@ char* SocketsAPI::servReceiveFile(const char* destPath, SocketsAPI* thisClient, 
 				fclose(dest);
 				std::cout << std::endl << "File " << fileNameString << " successfully writen!" << std::endl << std::endl;
 				//  delete[] buffer;
+			}
+		}
+	}
+}
+
+
+char* SocketsAPI::servReceiveFileInChunks(std::queue<char*>* queue, const char* destPath, SocketsAPI* thisClient, const char* ip, u_short port)
+{
+	if (!isServer) {
+		std::cout << "This instance of SocketsAPI is not a server!" << std::endl;
+		return 0;
+	}
+
+
+	//const int CHUNKSIZE = 1024 * 3; //bytes
+
+	//const std::string str1("C:\\Users\\Administrator\\Desktop\\FileTranserTest\\Source.rar"); //Source file
+
+	const std::string str2("C:\\Users\\Administrator\\Desktop\\Received\\ChunkedRecv "); //Save path
+	const std::string TEMP_EXT = ".inprogress"; //temp file extension until file is not downloaded
+
+
+	const std::string mapFilePath("C:\\Users\\Administrator\\Desktop\\Received\\"); //temp map file path
+	const std::string MAP_EXT = ".chunkmap"; //map file extention
+
+	FileInfo recvdFileInfo;
+	int isReady = 0;
+
+	while (true) {
+		fd_set copy = master;
+
+		int socketCount = select(NULL, &copy, nullptr, nullptr, nullptr);
+		for (int i = 0; i < socketCount; ++i) {
+			SOCKET sock = copy.fd_array[i];
+			if (sock == server) {
+				SOCKET client = accept(server, (SOCKADDR*) nullptr, nullptr);
+				FD_SET(client, &master);
+				std::cout << std::endl << "New active client! " << client << std::endl;
+				//  std::cout << std::endl << thisClient->getRawSocket() << client << std::endl;
+
+
+				char error_code;
+				int error_code_size = sizeof(error_code);
+
+			}
+			else {
+
+				clearBuffer();
+				int err = recv(sock, buffer, bufferSize, 0); ;
+
+				//tempBuff = this->receiveMsg(&err);
+				if (err <= 0) {
+					//  delete[] buffer;
+					closesocket(sock);
+					FD_CLR(sock, &master);
+					std::cout << std::endl << "Socket " << sock << " connection destroyed! " << std::endl;
+					continue;
+				};
+				// if (err == 0) continue;
+				char* newChunk = new char[1024 * 1024 + 300];
+		
+					std::cout << "received" << std::endl;
+					memcpy(newChunk, buffer, 1024 * 1024 + 300);
+					queue->push(newChunk);
+				
+
+
 			}
 		}
 	}
