@@ -26,7 +26,7 @@
 #include "headers/FileInfo.h"
 #include "headers/MyFileAPI.h"
 #include "headers/TransferHandler.h"
-
+#include "headers/SafeQueue.h"
 
 //Misc
 int numberOfDigits(int numToCheck) {

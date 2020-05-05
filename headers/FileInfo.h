@@ -78,15 +78,23 @@ public:
 		return bytesLeft;
 	}
 
+
+
 	int initForRecv(char* anyRecvdChunk, std::string fileSavePath, std::string tempExt, std::string mapPath, std::string mapExt);
 
 	int initForSend(std::string sourceFileFullPath, int chunkSize);
+
+	void sendEnd() {
+		fclose(thisFilePointer);
+		thisFilePointer = nullptr;
+		return;
+	}
 
 	char* createChunk(int mapPos);
 
 	int writeChunk(char* recvdChunk);
 
-	int resolveFile();
+	int solveFile();
 
 	int fileContainsChunk(char* chunk);
 

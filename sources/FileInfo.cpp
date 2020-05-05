@@ -58,7 +58,7 @@
 			filePathStr.resize(sourceFilePathSize);
 
 			if (filePathStr != fileFullPath.c_str()) {
-				std::cout << "Wrong \"fileInfo\" or map file, fileInfo is for " << fileFullPath << " and this map file contains " << filePathInMap << std::endl;
+				std::cout << "Wrong \"fileInfo\" or map file, fileInfo is for " << fileFullPath << " and this map file contains " << filePathStr << std::endl;
 				delete[] filePathInMap;
 				return 1;
 			}
@@ -140,7 +140,7 @@
 		}
 
 		int err = updateMapFile();
-		if (!err) delete[] chunkInfo->chunkRawFileData;
+		delete[] chunkInfo->chunkRawFileData;
 		return err;
 	}
 
@@ -234,7 +234,7 @@
 		state = 1;
 
 		if (NULL == (thisFilePointer = fopen(sourceFileFullPath.c_str(), "rb"))) {
-			std::cout << "CANT OPEN SOURCE FILE!";
+			std::cout << "CANT OPEN SOURCE FILE!FILE INFO";
 			exit(1);
 		}
 
@@ -260,7 +260,7 @@
 		return writeChunkDataToFile();
 	}
 
-	int FileInfo::resolveFile() {
+	int FileInfo::solveFile() {
 		FileInfo* fileInfo = this;
 		if (!fileInfo->complete) {
 			std::cout << "\nFailed to resolve file " << fileInfo->tempFileFullPath << " (file is not complete)\n";

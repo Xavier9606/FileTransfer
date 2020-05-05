@@ -40,7 +40,7 @@ inline int readFileData(const char* path, int filesize, char*& buffer) {
 	FILE* source;
 
 	if ((source = fopen(path, "rb")) == NULL) {
-		std::cout << "CANT OPEN SOURCE FILE!";
+		std::cout << "CANT OPEN SOURCE FILE!MYFILEAPI";
 		return -1;
 	}
 

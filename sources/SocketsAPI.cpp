@@ -3,6 +3,7 @@
 
 
 
+
 int SocketsAPI::initServer(int port) {
 
 	isServer = 1;
@@ -14,8 +15,29 @@ int SocketsAPI::initServer(int port) {
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_port = htons(port);
 
-	bind(server, (SOCKADDR*)&serverAddr, sizeof(serverAddr));
+	bind(server, (SOCKADDR*)&serverAddr, sizeof(serverAddr));	
 	listen(server, 0);
+
+	struct sockaddr_in sin,myAddr;
+	int addrlen = sizeof(sin);
+	if (getsockname(server, (struct sockaddr*) & sin, &addrlen) == 0 &&
+		sin.sin_family == AF_INET &&
+		addrlen == sizeof(sin))
+	{
+		int local_port = ntohs(sin.sin_port);
+		wchar_t myIP[16];
+		PWSTR myIPPW=myIP;
+
+		memset(&myAddr, 0, sizeof(myAddr));
+		InetNtopW(AF_INET, &myAddr.sin_addr, myIP, 16);
+		std::cout << "\n Getsockname " << local_port << "\n";
+		std::cout << "\n IP " << *InetNtopW(AF_INET, &myAddr.sin_addr, myIP, 16) << "\n";
+	}
+	else {
+		std::cout << "\n error " << "\n";
+	}
+		
+
 	FD_ZERO(&master);
 	FD_SET(server, &master);
 
@@ -80,6 +102,27 @@ int SocketsAPI::connectToServ(const char* ip, u_short port) {
 
 	connect(this->server, (SOCKADDR*)&addr, sizeof(addr));
 	listen(this->server, 0);
+
+
+	struct sockaddr_in sin, myAddr;
+	int addrlen = sizeof(sin);
+	if (getsockname(server, (struct sockaddr*) & sin, &addrlen) == 0 &&
+		sin.sin_family == AF_INET &&
+		addrlen == sizeof(sin))
+	{
+		int local_port = ntohs(sin.sin_port);
+		wchar_t myIP[16];
+		PWSTR myIPPW = myIP;
+
+		memset(&myAddr, 0, sizeof(myAddr));
+		InetNtopW(AF_INET, &myAddr.sin_addr, myIP, 16);
+		std::cout << "\n Getsockname " << local_port << "\n";
+		std::cout << "\n IP " << *myIP << "\n";
+	}
+	else {
+		std::cout << "\n error " << "\n";
+	}
+
 
 	return server;
 }
@@ -198,24 +241,13 @@ char* SocketsAPI::servReceiveFile(const char* destPath, SocketsAPI* thisClient, 
 }
 
 
-char* SocketsAPI::servReceiveFileInChunks(std::queue<char*>* queue, const char* destPath, SocketsAPI* thisClient, const char* ip, u_short port)
+char* SocketsAPI::servReceiveFileInChunks(MySafeQueue* queue)
 {
 	if (!isServer) {
 		std::cout << "This instance of SocketsAPI is not a server!" << std::endl;
 		return 0;
 	}
 
-
-	//const int CHUNKSIZE = 1024 * 3; //bytes
-
-	//const std::string str1("C:\\Users\\Administrator\\Desktop\\FileTranserTest\\Source.rar"); //Source file
-
-	const std::string str2("C:\\Users\\Administrator\\Desktop\\Received\\ChunkedRecv "); //Save path
-	const std::string TEMP_EXT = ".inprogress"; //temp file extension until file is not downloaded
-
-
-	const std::string mapFilePath("C:\\Users\\Administrator\\Desktop\\Received\\"); //temp map file path
-	const std::string MAP_EXT = ".chunkmap"; //map file extention
 
 	FileInfo recvdFileInfo;
 	int isReady = 0;

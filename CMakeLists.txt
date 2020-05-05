@@ -33,7 +33,8 @@ add_executable (ClientFileTransfer
   qml.qrc
   
   ${TS_FILES}
-  "sources/TransferHandler.cpp")
+  "sources/TransferHandler.cpp" "headers/TransferHandler.h" 
+  "sources/SafeQueue.cpp" "headers/SafeQueue.h")
 
 # TODO: Add tests and install targets if needed.
 

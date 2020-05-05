@@ -49,7 +49,7 @@ DONE Chunking files (probably std::map int, char[1024])
 const int CHUNKSIZE = 1024 * 1024;
 SocketsAPI thisClientSock;
 SocketsAPI thisServerSock;
-int BUFFSIZE = CHUNKSIZE*3;
+int BUFFSIZE = CHUNKSIZE * 3;
 int isRecv = 0;
 std::string ip = "";
 int portOut = 0;
@@ -57,20 +57,26 @@ int portOut = 0;
 const char* SOURCEPATH = "C:\\Users\\Administrator\\Desktop\\FileTranserTest\\Source.jpg";
 std::string DESTPATH = "C:\\Users\\Administrator\\Desktop\\Received\\";
 
-std::queue<char*> chunkQueue;
+
 TransferHandler sender;
 TransferHandler receiver;
+
+MySafeQueue chunkQueue;
+
 
 
 void receiveLoop() {
 
-	thisServerSock.servReceiveFileInChunks(&chunkQueue,DESTPATH.c_str(), &thisClientSock, "192.168.88.254", portOut);
+	thisServerSock.servReceiveFileInChunks(&chunkQueue);
 
 
 }
 
 void writeLoop() {
-	receiver.recvFileInChunks(&chunkQueue);
+	while (true) {
+		receiver.writeFileFromChunks(&chunkQueue, DESTPATH);
+		Sleep(10);
+	}
 }
 
 //int main(int argc, char* argv[]) {
@@ -94,79 +100,88 @@ void writeLoop() {
 //	return app.exec();;
 //}
 
-int main(){
+int main() {
 
-int portSelf = 0;
-std::cout << "Enter your open port to create your server: ";
-std::cin >> portSelf;
+	int portSelf = 0;
+	std::cout << "Enter your open port to create your server: ";
+	std::cin >> portSelf;
 
-if (portSelf == 1) portSelf = 5555;
-if (portSelf == 2) portSelf = 5556;
+	if (portSelf == 1) portSelf = 5555;
+	if (portSelf == 2) portSelf = 5556;
 
-thisServerSock.initServer(portSelf);
-thisServerSock.setBufferSize(BUFFSIZE);
-std::thread RecvTH(receiveLoop);
-std::thread WriteTH(writeLoop);
-RecvTH.detach();
-
-
-#ifndef DEBUG
-
-
-std::cout << "Enter IP of a buddy: ";
-std::cin >> ip;
-
-
-std::cout << "Enter your buddy's server port: ";
-std::cin >> portOut;
-
-#endif // !debug
-
-int other = 0;
-
-if (portSelf == 5555) portOut = 5556;
-if (portSelf == 5556) portOut = 5555;
+	thisServerSock.initServer(portSelf);
+	thisServerSock.setBufferSize(BUFFSIZE);
+	std::thread RecvTH(receiveLoop);
+	RecvTH.detach();
+	std::thread WriteTH(writeLoop);
+	WriteTH.detach();
 
 
 #ifndef DEBUG
-std::cout << "Where to save?: " << std::endl;
-std::string destPathString = "";
-std::cin >> destPathString;
 
 
+	std::cout << "Enter IP of a buddy: ";
+	std::cin >> ip;
 
-if ('\\' != destPathString.back() || '/' != destPathString.back()) {
-    destPathString += '\\';
-}
 
-DESTPATH = destPathString.c_str();
+	std::cout << "Enter your buddy's server port: ";
+	std::cin >> portOut;
 
 #endif // !debug
-
-std::cout << std::endl << "Enter anything to connect ";
-std::string test = "";
-std::cin >> test;
 
 #ifdef DEBUG
-ip = "192.168.88.254";
+
+	if (portSelf == 5555) portOut = 5556;
+	if (portSelf == 5556) portOut = 5555;
+#endif
+
+#ifndef DEBUG
+	std::cout << "Where to save?: " << std::endl;
+	std::cin >> DESTPATH;
+
+
+
+	if ('\\' != DESTPATH.back() || '/' != DESTPATH.back()) {
+		DESTPATH += '\\';
+	}
+
+
 #endif // !debug
 
-thisClientSock.connectToServ(ip.c_str(), portOut);
-thisClientSock.setBufferSize(BUFFSIZE);
+	std::cout << std::endl << "Enter anything to connect ";
+	std::string test = "";
+	std::cin >> test;
+
+#ifdef DEBUG
+	ip = "192.168.88.254";
+#endif // !debug
+
+	thisClientSock.connectToServ(ip.c_str(), portOut);
+	thisClientSock.setBufferSize(BUFFSIZE);
 
 
 
-while (true) {
+	while (true) {
 
-    std::string srcFilePath = "";
-    //std::filesystem::path srcFilePath = "";
-    std::cout << "Enter your file location: ";
-    std::cin >> srcFilePath;
+		std::string srcFilePath = "";
+		//std::filesystem::path srcFilePath = "";
+		std::cout << "Enter your file location: ";
+		std::cin >> srcFilePath;
 
-    sender.sendFileInChunks(srcFilePath.c_str(), CHUNKSIZE, &thisClientSock);
+		if ("rc" == srcFilePath) {
+			std::cout << "\nReconection\n";
+			thisClientSock.connectToServ(ip.c_str(), portOut);
+			thisClientSock.setBufferSize(BUFFSIZE);
+			continue;
+		}	
+		if (srcFilePath.size()<3) {
+			continue;
+		}
 
-    std::cout << std::endl << "DONE!" << std::endl;
-}
+		sender.sendFileInChunks(srcFilePath.c_str(), CHUNKSIZE, &thisClientSock);
+
+		std::cout << std::endl << "DONE!" << std::endl;
+	}
 
 
 	return 0;
@@ -182,3 +197,10 @@ while (true) {
 //
 //const std::string mapFilePath("C:\\Users\\Administrator\\Desktop\\Received\\"); //temp map file path
 //const std::string MAP_EXT = ".chunkmap"; //map file extention
+
+
+/*
+192.168.88.254
+C:\\Users\\Administrator\\Desktop\\FileTranserTest\\Source.jpg
+C:\\Users\\Administrator\\Desktop\\Received\\
+*/

@@ -3,6 +3,9 @@
 #include <iostream>
 #include <charconv>
 #include <queue>
+#include <string>
+#include "headers/SafeQueue.h"
+#include <ws2tcpip.h>
 
 class SocketsAPI {
 private:
@@ -11,7 +14,7 @@ private:
 	SOCKET client;
 	SOCKADDR_IN addr;
 	SOCKADDR_IN serverAddr;
-	int bufferSize = 50000000;
+	int bufferSize = 1024*1024*3;
 	char* buffer = new char[bufferSize];
 	int isServer = 0;
 
@@ -39,7 +42,7 @@ public:
 
 	char* servReceiveFile(const char* destPath, SocketsAPI* thisClient, const char* ip = "127.0.0.1", u_short port = 5555);
 
-	char* servReceiveFileInChunks(std::queue<char*>* queue, const char* destPath, SocketsAPI* thisClient, const char* ip = "127.0.0.1", u_short port = 5555);
+	char* servReceiveFileInChunks(MySafeQueue* queue);
 
 	void setBufferSize(int size);
 

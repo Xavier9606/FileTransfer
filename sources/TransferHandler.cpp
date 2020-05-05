@@ -3,34 +3,33 @@
 
 int TransferHandler::sendFileInChunks(const char* path, const int CHUNKSIZE, SocketsAPI* destSocket) {
 
-	const std::string str1("C:\\Users\\Administrator\\Desktop\\FileTranserTest\\Source.rar"); //Source file
-
 	FileInfo sourceFileInfo;
 	sourceFileInfo.initForSend(path, CHUNKSIZE);
-
+	char* chunk = nullptr;
 	for (int i = 0; i < sourceFileInfo.getChunksCount(); i++) {
 		std::cout << i << '\n';
-		
-		if (sourceFileInfo.getChunksCount()-1 == i){
-			std::cout << "Send " << send(destSocket->getRawSocket(), sourceFileInfo.createChunk(i), sourceFileInfo.getBytesLeft() + 300, 0) << '\n';
+
+		if (sourceFileInfo.getChunksCount() - 1 == i) {
+			chunk = sourceFileInfo.createChunk(i);
+			std::cout << "Send " << send(destSocket->getRawSocket(), chunk, sourceFileInfo.getBytesLeft() + 300, 0) << '\n';
+			
 		}
 		else {
-			std::cout << "Send " << send(destSocket->getRawSocket(), sourceFileInfo.createChunk(i), CHUNKSIZE + 300, 0) << '\n';
+			chunk = sourceFileInfo.createChunk(i);
+			std::cout << "Send " << send(destSocket->getRawSocket(), chunk, CHUNKSIZE + 300, 0) << '\n';
+			delete[] chunk;
 		}
-
-
-		Sleep(100);
 	}
+
+	sourceFileInfo.sendEnd();
 
 	return 0;
 }
 
-int TransferHandler::recvFileInChunks(std::queue<char*>* queue)
+int TransferHandler::writeFileFromChunks(MySafeQueue* queue, std::string destPath)
 {
 
-	const std::string str2("C:\\Users\\Administrator\\Desktop\\Received\\ChunkedRecv "); //Save path
 	const std::string TEMP_EXT = ".inprogress"; //temp file extension until file is not downloaded
-
 
 	const std::string mapFilePath("C:\\Users\\Administrator\\Desktop\\Received\\"); //temp map file path
 	const std::string MAP_EXT = ".chunkmap"; //map file extention
@@ -40,40 +39,30 @@ int TransferHandler::recvFileInChunks(std::queue<char*>* queue)
 		if (!queue->empty()) {
 
 
-		
-				if (!isReady) {
-					recvdFileInfo.initForRecv(queue->front(), str2, TEMP_EXT, mapFilePath, MAP_EXT);
-					isReady = 1;
 
-					//if (0 != recvdFileInfo.writeChunk(queue->front())) {
-					//	std::cout << "Error while writing chunk!\n";
-					//}
-					//else {
-					//	std::cout << "writen!\n" << std::endl;
-					//	//delete[] queue->front;
-					//	queue->pop();
-					//	continue;
-					//}
-				}
-				//std::cout << "recvdFileInfo.getChunksCount() " << recvdFileInfo.getChunksCount() << '\n';
-				//std::cout << "queue->size() " << queue->size() << '\n';
-				//if (recvdFileInfo.getChunksCount() == queue->size()) {
-					//std::cout << "received" << std::endl;
-					if (0 != recvdFileInfo.writeChunk(queue->front())) {
-						std::cout << "Error while writing chunk!\n";
-					}
-					else {
-						std::cout << "writen!\n" << std::endl;
-						queue->pop();
-					}
-				
-			//}
-			if (recvdFileInfo.isComplete()) {
-				recvdFileInfo.resolveFile();
-				int isReady = 0;
+			if (nullptr == recvdFileInfo) {
+				recvdFileInfo = new FileInfo;
+				recvdFileInfo->initForRecv(queue->front(), destPath, TEMP_EXT, mapFilePath, MAP_EXT);
+				isReady = 1;
+			}
+
+			if (0 != recvdFileInfo->writeChunk(queue->front())) {
+				std::cout << "Error while writing chunk!\n";
+			}
+			else {
+				std::cout << "writen!\n" << std::endl;
+				delete[] queue->front();
+				queue->pop();
+			}
+
+			if (recvdFileInfo->isComplete()) {
+				recvdFileInfo->solveFile();
+				delete recvdFileInfo;
+				recvdFileInfo = nullptr;
 				return 0;
 			}
 		}
+		Sleep(1); //for not loading CPU while chunks are downloaded but writing didn't started yet
 	}
 	return 0;
 }
