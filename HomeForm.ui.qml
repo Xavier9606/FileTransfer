@@ -5,40 +5,65 @@ Page {
     id: page
     width: 600
     height: 400
-    property alias button: button
+    property alias portOut: portOut
+    property alias ip: ip
+    property alias filePath: filePath
+    property alias portSelf: portSelf
+    property alias mybutton: mybutton
 
     title: qsTr("Home")
 
-    Label {
-        text: qsTr("You are on the home page.")
-        anchors.centerIn: parent
+    TextField {
+        id: portSelf
+        x: 95
+        y: 67
+        font.capitalization: Font.AllUppercase
+        placeholderText: "Your port"
     }
 
     TextField {
-        id: textField
-        x: 52
-        y: 70
-        text: qsTr("IP")
+        id: filePath
+        x: 95
+        y: 289
+        width: 317
+        height: 44
+        text: qsTr("")
+        placeholderText: "PATH"
+    }
+
+    Button {
+        id: mybutton
+        x: 444
+        y: 287
+        text: qsTr("Send")
     }
 
     TextField {
-        id: textField1
-        x: 52
-        y: 125
-        text: qsTr("PORT")
+        id: ip
+        x: 335
+        y: 67
+        placeholderText: "IP"
     }
 
     TextField {
-        id: textField2
-        x: 52
-        y: 186
-        text: qsTr("FILE PATH")
+        id: portOut
+        x: 335
+        y: 122
+        text: qsTr("")
+        placeholderText: "PORT"
     }
 
     Button {
         id: button
-        x: 52
-        y: 256
-        text: qsTr("Button")
+        x: 356
+        y: 176
+        text: qsTr("CONNECT")
+    }
+
+    Button {
+        id: button1
+        x: 121
+        y: 122
+        text: qsTr("START")
     }
 }

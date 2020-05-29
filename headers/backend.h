@@ -10,13 +10,14 @@ class BackEnd : public QObject
 
 public:
     explicit BackEnd(QObject *parent = nullptr);
-    Q_INVOKABLE void dataReceived(QString ip, QString port, QString filePath);
+    Q_INVOKABLE void dataReceived(QString portSelf, QString portOut, QString ip, QString filePath);
 
 signals:
 
 private:
+    qint16 m_portOut;
+    QString m_portSelf;
     QString m_ip;
-    qint16 m_port;
     QString m_filePath;
 };
 

@@ -79,113 +79,114 @@ void writeLoop() {
 	}
 }
 
-//int main(int argc, char* argv[]) {
-//
-//	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-//
-//	QGuiApplication app(argc, argv);
-//
-//    qmlRegisterType<BackEnd>("io.qt.examples.backend", 1, 0, "BackEnd");
-//
-//	QQmlApplicationEngine engine;
-//	const QUrl url(QStringLiteral("qrc:/main.qml"));
-//
-//	QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-//		&app, [url](QObject* obj, const QUrl& objUrl) {
-//			if (!obj && url == objUrl)
-//				QCoreApplication::exit(-1);
-//		}, Qt::QueuedConnection);
-//	engine.load(url);
-//
-//	return app.exec();;
-//}
+int main(int argc, char* argv[]) {
 
-int main() {
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
-	int portSelf = 0;
-	std::cout << "Enter your open port to create your server: ";
-	std::cin >> portSelf;
+    QGuiApplication app(argc, argv);
+    QQmlApplicationEngine engine;
 
-	if (portSelf == 1) portSelf = 5555;
-	if (portSelf == 2) portSelf = 5556;
-
-	thisServerSock.initServer(portSelf);
-	thisServerSock.setBufferSize(BUFFSIZE);
-	std::thread RecvTH(receiveLoop);
-	RecvTH.detach();
-	std::thread WriteTH(writeLoop);
-	WriteTH.detach();
+    qmlRegisterType<BackEnd>("io.qt.examples.backend", 1, 0, "BackEnd");
 
 
-#ifndef DEBUG
+    const QUrl url(QStringLiteral("qrc:/main.qml"));
 
+    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
+        &app, [url](QObject* obj, const QUrl& objUrl) {
+            if (!obj && url == objUrl)
+                QCoreApplication::exit(-1);
+        }, Qt::QueuedConnection);
+    engine.load(url);
 
-	std::cout << "Enter IP of a buddy: ";
-	std::cin >> ip;
-
-
-	std::cout << "Enter your buddy's server port: ";
-	std::cin >> portOut;
-
-#endif // !debug
-
-#ifdef DEBUG
-
-	if (portSelf == 5555) portOut = 5556;
-	if (portSelf == 5556) portOut = 5555;
-#endif
-
-#ifndef DEBUG
-	std::cout << "Where to save?: " << std::endl;
-	std::cin >> DESTPATH;
-
-
-
-	if ('\\' != DESTPATH.back() || '/' != DESTPATH.back()) {
-		DESTPATH += '\\';
-	}
-
-
-#endif // !debug
-
-	std::cout << std::endl << "Enter anything to connect ";
-	std::string test = "";
-	std::cin >> test;
-
-#ifdef DEBUG
-	ip = "192.168.88.254";
-#endif // !debug
-
-	thisClientSock.connectToServ(ip.c_str(), portOut);
-	thisClientSock.setBufferSize(BUFFSIZE);
-
-
-
-	while (true) {
-
-		std::string srcFilePath = "";
-		//std::filesystem::path srcFilePath = "";
-		std::cout << "Enter your file location: ";
-		std::cin >> srcFilePath;
-
-		if ("rc" == srcFilePath) {
-			std::cout << "\nReconection\n";
-			thisClientSock.connectToServ(ip.c_str(), portOut);
-			thisClientSock.setBufferSize(BUFFSIZE);
-			continue;
-		}	
-		if (srcFilePath.size()<3) {
-			continue;
-		}
-
-		sender.sendFileInChunks(srcFilePath.c_str(), CHUNKSIZE, &thisClientSock);
-
-		std::cout << std::endl << "DONE!" << std::endl;
-	}
-
-
-	return 0;
+    return app.exec();;
 }
+
+//int main() {
+
+//	int portSelf = 0;
+//	std::cout << "Enter your open port to create your server: ";
+//	std::cin >> portSelf;
+
+//	if (portSelf == 1) portSelf = 5555;
+//	if (portSelf == 2) portSelf = 5556;
+
+//	thisServerSock.initServer(portSelf);
+//	thisServerSock.setBufferSize(BUFFSIZE);
+//	std::thread RecvTH(receiveLoop);
+//	RecvTH.detach();
+//	std::thread WriteTH(writeLoop);
+//	WriteTH.detach();
+
+
+//#ifndef DEBUG
+
+
+//	std::cout << "Enter IP of a buddy: ";
+//	std::cin >> ip;
+
+
+//	std::cout << "Enter your buddy's server port: ";
+//	std::cin >> portOut;
+
+//#endif // !debug
+
+//#ifdef DEBUG
+
+//	if (portSelf == 5555) portOut = 5556;
+//	if (portSelf == 5556) portOut = 5555;
+//#endif
+
+//#ifndef DEBUG
+//	std::cout << "Where to save?: " << std::endl;
+//	std::cin >> DESTPATH;
+
+
+
+//	if ('\\' != DESTPATH.back() || '/' != DESTPATH.back()) {
+//		DESTPATH += '\\';
+//	}
+
+
+//#endif // !debug
+
+//	std::cout << std::endl << "Enter anything to connect ";
+//	std::string test = "";
+//	std::cin >> test;
+
+//#ifdef DEBUG
+//	ip = "192.168.88.254";
+//#endif // !debug
+
+//	thisClientSock.connectToServ(ip.c_str(), portOut);
+//	thisClientSock.setBufferSize(BUFFSIZE);
+
+
+
+//	while (true) {
+
+//		std::string srcFilePath = "";
+//		//std::filesystem::path srcFilePath = "";
+//		std::cout << "Enter your file location: ";
+//		std::cin >> srcFilePath;
+
+//		if ("rc" == srcFilePath) {
+//			std::cout << "\nReconection\n";
+//			thisClientSock.connectToServ(ip.c_str(), portOut);
+//			thisClientSock.setBufferSize(BUFFSIZE);
+//			continue;
+//		}
+//		if (srcFilePath.size()<3) {
+//			continue;
+//		}
+
+//		sender.sendFileInChunks(srcFilePath.c_str(), CHUNKSIZE, &thisClientSock);
+
+//		std::cout << std::endl << "DONE!" << std::endl;
+//	}
+
+
+//	return 0;
+//}
 
 //const int CHUNKSIZE = 1024 * 3; //bytes
 //

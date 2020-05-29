@@ -2,23 +2,25 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="TestQtProject_en_US">
 <context>
-    <name>Home</name>
-    <message>
-        <location filename="Home.qml" line="6"/>
-        <source>Button pressed</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>HomeForm.ui</name>
     <message>
-        <location filename="HomeForm.ui.qml" line="10"/>
+        <location filename="HomeForm.ui.qml" line="14"/>
         <source>Home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="HomeForm.ui.qml" line="13"/>
-        <source>You are on the home page.</source>
+        <location filename="HomeForm.ui.qml" line="38"/>
+        <source>Send</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="HomeForm.ui.qml" line="60"/>
+        <source>CONNECT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="HomeForm.ui.qml" line="67"/>
+        <source>START</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -26,36 +28,16 @@
         <source></source>
         <translation></translation>
     </message>
-    <message>
-        <location filename="HomeForm.ui.qml" line="28"/>
-        <source>PORT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="HomeForm.ui.qml" line="35"/>
-        <source>FILE PATH</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="HomeForm.ui.qml" line="42"/>
-        <source>Button</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="HomeForm.ui.qml" line="21"/>
-        <source>IP</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>Page1Form.ui</name>
     <message>
-        <location filename="Page1Form.ui.qml" line="8"/>
+        <location filename="Page1Form.ui.qml" line="9"/>
         <source>Page 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="Page1Form.ui.qml" line="11"/>
+        <location filename="Page1Form.ui.qml" line="13"/>
         <source>You are on Page 1.</source>
         <translation type="unfinished"></translation>
     </message>

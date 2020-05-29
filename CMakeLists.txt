@@ -30,6 +30,8 @@ add_executable (ClientFileTransfer
   "sources/TransferHandler.cpp" "headers/TransferHandler.h"
   headers/backend.h
   "sources/backend.cpp"
+  sources/backmain.cpp
+  headers/backmain.h
   qml.qrc
   
   ${TS_FILES}
