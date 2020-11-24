@@ -6,8 +6,16 @@ HomeForm {
     anchors.fill: parent
 
 
-     mybutton.onClicked: backend.dataReceived(portSelf.text, portOut.text,ip.text,filePath.text)
-     //textField1.on
+
+     initButton.onClicked:      backend.init(portSelf.text);
+     connectButton.onClicked:   backend.connect(portOut.text,ip.text);
+     sendButton.onClicked:{
+                                backend.dataReceived(portSelf.text, portOut.text,ip.text,filePath.text)
+                                backend.send(filePath.text);
+     }
+
+     setButton.onClicked:       backend.setFileSavePath(fileSavePath.text);
+
 
     BackEnd {
         id: backend

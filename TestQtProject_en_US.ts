@@ -4,23 +4,28 @@
 <context>
     <name>HomeForm.ui</name>
     <message>
-        <location filename="HomeForm.ui.qml" line="14"/>
+        <location filename="HomeForm.ui.qml" line="19"/>
         <source>Home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="HomeForm.ui.qml" line="38"/>
+        <location filename="HomeForm.ui.qml" line="43"/>
         <source>Send</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="HomeForm.ui.qml" line="60"/>
+        <location filename="HomeForm.ui.qml" line="65"/>
         <source>CONNECT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="HomeForm.ui.qml" line="67"/>
+        <location filename="HomeForm.ui.qml" line="72"/>
         <source>START</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="HomeForm.ui.qml" line="90"/>
+        <source>SET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

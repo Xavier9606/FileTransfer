@@ -18,24 +18,24 @@ int SocketsAPI::initServer(int port) {
 	bind(server, (SOCKADDR*)&serverAddr, sizeof(serverAddr));	
 	listen(server, 0);
 
-	struct sockaddr_in sin,myAddr;
-	int addrlen = sizeof(sin);
-	if (getsockname(server, (struct sockaddr*) & sin, &addrlen) == 0 &&
-		sin.sin_family == AF_INET &&
-		addrlen == sizeof(sin))
-	{
-		int local_port = ntohs(sin.sin_port);
-		wchar_t myIP[16];
-		PWSTR myIPPW=myIP;
+    struct sockaddr_in sin,myAddr;
+    int addrlen = sizeof(sin);
+    if (getsockname(server, (struct sockaddr*) & sin, &addrlen) == 0 &&
+        sin.sin_family == AF_INET &&
+        addrlen == sizeof(sin))
+    {
+        int local_port = ntohs(sin.sin_port);
+        wchar_t myIP[16];
+        PWSTR myIPPW=myIP;
 
-		memset(&myAddr, 0, sizeof(myAddr));
-		InetNtopW(AF_INET, &myAddr.sin_addr, myIP, 16);
-		std::cout << "\n Getsockname " << local_port << "\n";
-		std::cout << "\n IP " << *InetNtopW(AF_INET, &myAddr.sin_addr, myIP, 16) << "\n";
-	}
-	else {
-		std::cout << "\n error " << "\n";
-	}
+        memset(&myAddr, 0, sizeof(myAddr));
+        InetNtopW(AF_INET, &myAddr.sin_addr, myIP, 16);
+        std::cout << "\n Getsockname " << local_port << "\n";
+        std::cout << "\n IP " << *InetNtopW(AF_INET, &myAddr.sin_addr, myIP, 16) << "\n";
+    }
+    else {
+        std::cout << "\n error " << "\n";
+    }
 		
 
 	FD_ZERO(&master);

@@ -3,38 +3,31 @@
 #pragma once
 
 //Qt
-#include <QFile>
-#include <QDataStream>
-#include <QString>
-#include <QFileInfo>
-#include <QDebug>
-#include <QByteArray>
+//#include <QFile>
+//#include <QDataStream>
+//#include <QString>
+//#include <QFileInfo>
+//#include <QDebug>
+//#include <QByteArray>
 
-//Standart/Windows
-#include <winsock2.h>
-#include "stdio.h"
-#include <iostream>
-#include <charconv>
-#include <thread>
-#include <mutex>
-#include <filesystem>
-#include <queue>
+////Standart/Windows
+//#include <winsock2.h>
+//#include "stdio.h"
+//#include <iostream>
+//#include <charconv>
+//#include <thread>
+//#include <mutex>
+//#include <filesystem>
+//#include <queue>
 
 
-//My API's & etc
-#include "headers/SocketsAPI.h"
-#include "headers/FileInfo.h"
-#include "headers/MyFileAPI.h"
-#include "headers/TransferHandler.h"
-#include "headers/SafeQueue.h"
+////My API's & etc
+//#include "headers/SocketsAPI.h"
+//#include "headers/FileInfo.h"
+//#include "headers/MyFileAPI.h"
+//#include "headers/TransferHandler.h"
+//#include "headers/SafeQueue.h"
 
-//Misc
-int numberOfDigits(int numToCheck) {
-	for (int i = 1; i < 20; i++) {
-		numToCheck /= 10;
-		if (numToCheck <= 0) {
-			return i;
-		}
-	}
-}
+////Misc
+
 // TODO: Reference additional headers your program requires here.
